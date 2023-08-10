@@ -25,7 +25,8 @@ h1 {
   text-align: center;
 }
 
-h2 {
+h2,
+.subheading {
   font-family: var(--font-family-secondary);
   font-size: 1.5rem;
 }
