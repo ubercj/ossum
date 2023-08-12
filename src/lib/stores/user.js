@@ -1,14 +1,5 @@
 import { writable } from 'svelte/store';
 
-// /**
-//  * A logged-in user of the site
-//  * @typedef {Object} User
-//  * @property {string} id
-//  * @property {string} email
-//  */
-
-// /** @typedef {Pick<import('@supabase/supabase-js').AuthUser, "id" | "email">} User */
-
 function createUser() {
 	const { subscribe, set } = writable({});
 

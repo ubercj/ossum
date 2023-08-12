@@ -1,15 +1,11 @@
 <script>
 	import { onMount } from 'svelte';
+	import { title } from '$lib/stores/title';
 	import { currentUser } from '$lib/stores/user';
 	import { getGroups, getProfilesForGroup } from '$lib/services/supabase';
-
-	/** @type {import('@supabase/supabase-js').User} user */
-	let user;
-	currentUser.subscribe((newUser) => {
-		user = newUser;
-	});
-
 	let loading = false;
+
+	$title = 'Dashboard';
 
 	/**
 	 * @type {Group[]}
@@ -33,7 +29,7 @@
 	const getDashboardData = async () => {
 		loading = true;
 		try {
-			const { data: groupData, error: groupError } = await getGroups(user.id);
+			const { data: groupData, error: groupError } = await getGroups($currentUser.id);
 			if (groupData) {
 				userGroups = groupData;
 				if (!selectedGroup) selectedGroup = groupData[0];

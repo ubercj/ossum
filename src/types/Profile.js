@@ -1,5 +1,6 @@
 /**
  * @typedef {object} Profile
+ *
  * @property {string} username
  * @property {string} [avatar_url]
  * @property {string} [website]

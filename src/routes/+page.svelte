@@ -1,7 +1,9 @@
 <script>
 	import { supabase } from '$lib/supabaseClient';
 	import { currentUser } from '$lib/stores/user.js';
+	import { title } from '$lib/stores/title';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import github_logo from '$lib/assets/github.svg';
 
 	/** @type {import('@supabase/supabase-js').AuthSession} */
@@ -23,6 +25,8 @@
 		handleAuthState();
 	});
 
+	$title = '';
+
 	const handleAuthState = async () => {
 		const sessResp = await supabase.auth.getSession();
 		if (sessResp.data.session) {
@@ -34,6 +38,7 @@
 			if (_session) {
 				session = _session;
 				currentUser.set(session.user);
+				goto('/dashboard');
 			}
 		});
 	};
