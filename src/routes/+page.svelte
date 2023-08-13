@@ -99,7 +99,7 @@
 			{loading}
 			on:click={handleSignInWithOAuth}
 		>
-			<img slot="prefix" src={github_logo} alt="GitHub Icon" />
+			<img slot="prefix" src={github_logo} alt="" />
 			<span>Sign In with GitHub</span>
 		</sl-button>
 		<div role="separator" class="divider">
