@@ -32,6 +32,7 @@
 			});
 
 			if (error) throw error;
+			goto('/dashboard');
 		} catch (error) {
 			console.error(error);
 			errorMessage = error.message;
@@ -53,6 +54,7 @@
 			});
 
 			if (error) throw error;
+			goto('/dashboard');
 		} catch (error) {
 			console.error(error);
 		} finally {

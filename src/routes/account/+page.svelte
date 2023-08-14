@@ -67,6 +67,11 @@
 			loading = false;
 		}
 	};
+
+	const signOut = async () => {
+		await supabase.auth.signOut();
+		goto('/');
+	};
 </script>
 
 <section class="user-account">
@@ -111,12 +116,7 @@
 		<sl-button type="submit" class="update" aria-live="polite" {loading}>
 			<span>Update Profile</span>
 		</sl-button>
-		<sl-button
-			type="button"
-			variant="warning"
-			aria-live="polite"
-			on:click={() => supabase.auth.signOut()}
-		>
+		<sl-button type="button" variant="warning" aria-live="polite" on:click={signOut}>
 			<span>Sign Out</span>
 		</sl-button>
 	</form>
