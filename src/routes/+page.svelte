@@ -1,13 +1,11 @@
 <script>
-	import { supabase } from '$lib/supabaseClient';
-	import { currentUser } from '$lib/stores/user.js';
 	import { title } from '$lib/stores/title';
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import github_logo from '$lib/assets/github.svg';
 
-	/** @type {import('@supabase/supabase-js').AuthSession} */
-	let session;
+	export let data;
+	let { supabase } = data;
+	$: ({ supabase } = data);
 
 	/** @type {boolean}*/
 	let loading;
@@ -21,27 +19,7 @@
 	/** @type {string}*/
 	let errorMessage = '';
 
-	onMount(() => {
-		handleAuthState();
-	});
-
 	$title = '';
-
-	const handleAuthState = async () => {
-		const sessResp = await supabase.auth.getSession();
-		if (sessResp.data.session) {
-			session = sessResp.data.session;
-			currentUser.set(session?.user);
-		}
-
-		supabase.auth.onAuthStateChange((_event, _session) => {
-			if (_session) {
-				session = _session;
-				currentUser.set(session.user);
-				goto('/dashboard');
-			}
-		});
-	};
 
 	const handleSignInWithPassword = async () => {
 		try {

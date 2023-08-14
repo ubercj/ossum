@@ -1,29 +1,48 @@
 <script>
 	import './styles.css';
-	import { currentUser } from '$lib/stores/user';
+
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
+
+	export let data;
+
+	let { supabase, session } = data;
+	$: ({ supabase, session } = data);
+
+	onMount(() => {
+		const {
+			data: { subscription }
+		} = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
+
+		return () => subscription.unsubscribe();
+	});
 </script>
 
 <div class="root">
 	<nav class="main-nav">
 		<ul>
-			{#if $currentUser.id}
-				<li>
-					<a href="/dashboard">Dashboard</a>
-				</li>
-				<li>
-					<a href="/account">Profile</a>
-				</li>
-				<li>
-					<a href="/groups">Groups</a>
-				</li>
-			{:else}
-				<li>
-					<a href="/">Login</a>
-				</li>
-				<li>
-					<a href="/signup">Sign Up</a>
-				</li>
-			{/if}
+			<!-- {#if $currentUser.id} -->
+			<li>
+				<a href="/dashboard">Dashboard</a>
+			</li>
+			<li>
+				<a href="/account">Profile</a>
+			</li>
+			<li>
+				<a href="/groups">Groups</a>
+			</li>
+			<!-- {:else} -->
+			<li>
+				<a href="/">Login</a>
+			</li>
+			<li>
+				<a href="/signup">Sign Up</a>
+			</li>
+			<!-- {/if} -->
 		</ul>
 	</nav>
 	<main class="main container">
