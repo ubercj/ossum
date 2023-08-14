@@ -1,9 +1,29 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { supabase } from '$lib/supabaseClient';
-	import { currentUser } from '$lib/stores/user';
 	import { title } from '$lib/stores/title';
-	import { getGroups } from '$lib/services/supabase';
+
+	export let data;
+	let { supabase } = data;
+	$: ({ supabase } = data);
+	$: user = data.session?.user;
+
+	/**
+	 * @param {string} userId
+	 */
+	export const getGroups = async (userId) => {
+		return await supabase
+			.from('groups')
+			.select(
+				`
+          id,
+          name,
+          group_profile!inner (
+            id
+          )
+        `
+			)
+			.eq('group_profile.profile_id', userId);
+	};
 
 	$title = 'Groups';
 
@@ -23,7 +43,7 @@
 
 	const getGroupsData = async () => {
 		try {
-			const { data: groupData, error: groupError } = await getGroups($currentUser.id);
+			const { data: groupData, error: groupError } = await getGroups(user.id);
 			if (groupData) {
 				userGroups = groupData;
 			}
@@ -68,7 +88,7 @@
 		try {
 			let { error, status } = await supabase
 				.from('group_profile')
-				.insert({ group_id: groupId, profile_id: $currentUser.id });
+				.insert({ group_id: groupId, profile_id: user.id });
 
 			if (status === 201) {
 				alert('You have successfully joined the group.');

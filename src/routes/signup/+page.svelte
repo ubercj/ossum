@@ -1,6 +1,9 @@
 <script lang="ts">
-	import { supabase } from '$lib/supabaseClient';
 	import { title } from '$lib/stores/title';
+
+	export let data;
+	let { supabase } = data;
+	$: ({ supabase } = data);
 
 	$title = 'Sign Up';
 

@@ -1,8 +1,53 @@
 <script>
 	import { onMount } from 'svelte';
 	import { title } from '$lib/stores/title';
-	import { currentUser } from '$lib/stores/user';
-	import { getGroups, getProfilesForGroup } from '$lib/services/supabase';
+
+	export let data;
+	let { supabase } = data;
+	$: ({ supabase } = data);
+	$: user = data.session?.user;
+
+	/**
+	 * @param {string} userId
+	 */
+	export const getGroups = async (userId) => {
+		return await supabase
+			.from('groups')
+			.select(
+				`
+          id,
+          name,
+          group_profile!inner (
+            id
+          )
+        `
+			)
+			.eq('group_profile.profile_id', userId);
+	};
+
+	/**
+	 * @param {number} groupId
+	 */
+	export const getProfilesForGroup = async (groupId) => {
+		return await supabase
+			.from('profiles')
+			.select(
+				`
+          id,
+          username,
+           website,
+           avatar_url,
+           shirt_size,
+           pull_requests,
+           group_profile!inner (
+            id,
+            group_id
+            )
+          `
+			)
+			.eq('group_profile.group_id', groupId);
+	};
+
 	let loading = false;
 
 	$title = 'Dashboard';
@@ -29,7 +74,7 @@
 	const getDashboardData = async () => {
 		loading = true;
 		try {
-			const { data: groupData, error: groupError } = await getGroups($currentUser.id);
+			const { data: groupData, error: groupError } = await getGroups(user.id);
 			if (groupData) {
 				userGroups = groupData;
 				if (!selectedGroup) selectedGroup = groupData[0];

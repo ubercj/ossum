@@ -1,79 +1,35 @@
-<script lang="ts">
+<script>
 	import { createEventDispatcher } from 'svelte';
-	import { supabase } from '$lib/supabaseClient';
+
+	const dispatch = createEventDispatcher();
+
+	function upload() {
+		dispatch('upload');
+	}
 
 	/**
 	 * @type {string}
 	 */
-	export let url;
+	export let avatarUrl;
 
 	/**
 	 * @type {string}
 	 */
-	let avatarUrl = '';
-	let uploading = false;
+	export let imageUrl;
+
+	/**
+	 * @type {boolean}
+	 */
+	export let loading;
 
 	/**
 	 * @type {FileList}
 	 */
-	let files;
-
-	const dispatch = createEventDispatcher();
-
-	/**
-	 * @param {string} path
-	 */
-	const downloadImage = async (path) => {
-		try {
-			const { data, error } = await supabase.storage.from('avatars').download(path);
-
-			if (error) {
-				throw error;
-			}
-
-			const url = URL.createObjectURL(data);
-			avatarUrl = url;
-		} catch (error) {
-			if (error instanceof Error) {
-				console.log('Error downloading image: ', error.message);
-			}
-		}
-	};
-
-	const uploadAvatar = async () => {
-		try {
-			uploading = true;
-
-			if (!files || files.length === 0) {
-				throw new Error('You must select an image to upload.');
-			}
-
-			const file = files[0];
-			const fileExt = file.name.split('.').pop();
-			const filePath = `${Math.random()}.${fileExt}`;
-
-			let { error } = await supabase.storage.from('avatars').upload(filePath, file);
-
-			if (error) {
-				throw error;
-			}
-
-			url = filePath;
-			dispatch('upload');
-		} catch (error) {
-			if (error instanceof Error) {
-				alert(error.message);
-			}
-		} finally {
-			uploading = false;
-		}
-	};
-
-	$: if (url) downloadImage(url);
+	export let files;
 </script>
 
 <div>
-	<sl-avatar shape="rounded" image={avatarUrl} />
+	<sl-avatar shape="rounded" image={imageUrl} />
 	<!-- TODO: This is NOT accessible to screen readers -->
 	<label class="upload" for="profile-pic">
 		<sl-button>Upload Avatar</sl-button>
@@ -85,8 +41,8 @@
 		id="profile-pic"
 		accept="image/*"
 		bind:files
-		on:change={uploadAvatar}
-		disabled={uploading}
+		on:change={upload}
+		disabled={loading}
 	/>
 </div>
 
