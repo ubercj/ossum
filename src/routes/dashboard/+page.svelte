@@ -10,19 +10,9 @@
 	/**
 	 * @param {string} userId
 	 */
-	export const getGroups = async (userId) => {
-		return await supabase
-			.from('groups')
-			.select(
-				`
-          id,
-          name,
-          group_profile!inner (
-            id
-          )
-        `
-			)
-			.eq('group_profile.profile_id', userId);
+	const getGroups = async (userId) => {
+		const response = await fetch(`/api/groups?id=${userId}`);
+		return await response.json();
 	};
 
 	/**
@@ -74,14 +64,8 @@
 	const getDashboardData = async () => {
 		loading = true;
 		try {
-			const { data: groupData, error: groupError } = await getGroups(user.id);
-			if (groupData) {
-				userGroups = groupData;
-				if (!selectedGroup) selectedGroup = groupData[0];
-			}
-			if (groupError) {
-				throw new Error(`There was an error retrieving group data`);
-			}
+			userGroups = await getGroups(user.id);
+			if (!selectedGroup) selectedGroup = userGroups[0];
 
 			const { data: groupProfiles, error: profilesError } = await getProfilesForGroup(
 				selectedGroup.id
