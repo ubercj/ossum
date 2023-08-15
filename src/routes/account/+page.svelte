@@ -169,7 +169,7 @@
 			{loading}
 			on:upload={uploadAvatar}
 		/>
-		<sl-input id="email" label="Email" type="text" value={user.email} disabled />
+		<sl-input id="email" label="Email" type="text" value={user?.email} disabled />
 		<sl-input
 			id="username"
 			label="Name"
@@ -177,19 +177,22 @@
 			value={currentProfile.username}
 			on:sl-input={(e) => (currentProfile.username = e.target.value)}
 		/>
-		<sl-select
-			label="Shirt Size"
-			value={currentProfile.shirt_size}
-			placeholder="Select a Size"
-			clearable
-			on:sl-change={(e) => (currentProfile.shirt_size = e.target.value)}
-		>
-			{#each allShirtSizes as singleShirtSize}
-				<sl-menu-item value={singleShirtSize}>
-					{singleShirtSize}
-				</sl-menu-item>
-			{/each}
-		</sl-select>
+		<!-- TODO - use #await ... :then block?  -->
+		{#if currentProfile.shirt_size}
+			<sl-select
+				label="Shirt Size"
+				value={currentProfile.shirt_size}
+				placeholder="Select a Size"
+				clearable
+				on:sl-change={(e) => (currentProfile.shirt_size = e.target.value)}
+			>
+				{#each allShirtSizes as singleShirtSize}
+					<sl-option value={singleShirtSize}>
+						{singleShirtSize}
+					</sl-option>
+				{/each}
+			</sl-select>
+		{/if}
 		<sl-input
 			id="pullRequests"
 			label="Pull Requests"

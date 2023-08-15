@@ -145,3 +145,23 @@
 
 	<p><a href="/groups">See all groups.</a></p>
 </section>
+
+<style>
+	.dashboard {
+		flex: 2;
+		padding: 2rem;
+	}
+
+	.profiles {
+		padding: 1rem 0;
+		border-top: 1px solid var(--sl-panel-border-color);
+	}
+
+	ul {
+		list-style: none;
+	}
+
+	sl-card {
+		width: 100%;
+	}
+</style>
