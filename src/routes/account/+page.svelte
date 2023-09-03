@@ -2,6 +2,7 @@
 	import { onMount, createEventDispatcher } from 'svelte';
 	import Avatar from './Avatar.svelte';
 	import { title } from '$lib/stores/title';
+	import { getIssues, getUser } from '$lib/octokit';
 	import { goto } from '$app/navigation';
 
 	export let data;
@@ -56,7 +57,14 @@
 	 */
 	let files;
 
-	onMount(() => {
+	let githubUserData;
+	let githubIssueData;
+
+	onMount(async () => {
+		if (data.session?.provider_token) {
+			githubUserData = await getUser(data.session.provider_token);
+			githubIssueData = await getIssues(githubUserData.login);
+		}
 		getProfile();
 	});
 
@@ -214,6 +222,36 @@
 			<span>Sign Out</span>
 		</sl-button>
 	</form>
+</section>
+
+<section class="metrics">
+	<h2>Metrics</h2>
+	<div>
+		<h3>Pull Requests</h3>
+		{#if githubIssueData}
+			<p>Total: {githubIssueData.length}</p>
+			<ul class="response">
+				{#each githubIssueData as issue}
+					<li>
+						<sl-card>
+							<div slot="header"><h3>{issue.title}</h3></div>
+							<p>{issue.created_at}</p>
+							<p>{issue.closed_at}</p>
+							<p>{issue.state}</p>
+							<p>{issue.url}</p>
+							{#if issue.labels}
+								<ul>
+									{#each issue.labels as label}
+										<li>{label}</li>
+									{/each}
+								</ul>
+							{/if}
+						</sl-card>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
 </section>
 
 <style>
