@@ -1,4 +1,5 @@
 <script>
+	import { PUBLIC_REDIRECT_URL } from '$env/static/public';
 	import { title } from '$lib/stores/title';
 	import { goto } from '$app/navigation';
 	import github_logo from '$lib/assets/github.svg';
@@ -49,7 +50,7 @@
 			const { data, error } = await supabase.auth.signInWithOAuth({
 				provider: 'github',
 				options: {
-					redirectTo: import.meta.env.VITE_REDIRECT_URL
+					redirectTo: PUBLIC_REDIRECT_URL
 				}
 			});
 
