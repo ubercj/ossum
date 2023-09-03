@@ -9,6 +9,8 @@
 	let { supabase } = data;
 	$: ({ supabase } = data);
 	$: user = data.session?.user;
+	$: isGithub = user?.app_metadata.provider === 'github';
+	$: if (!isGithub && currentProfile.avatar_url) downloadImage(currentProfile.avatar_url);
 
 	$title = 'Account';
 
@@ -69,6 +71,17 @@
 	});
 
 	const getProfile = async () => {
+		if (githubUserData) {
+			currentProfile = {
+				username: githubUserData.name,
+				// shirt_size: data.shirt_size,
+				// pull_requests: data.pull_requests,
+				website: githubUserData.html_url,
+				avatar_url: githubUserData.avatar_url
+			};
+			return;
+		}
+
 		try {
 			loading = true;
 			const { data, error, status } = await getUserProfile(user.id);
@@ -163,20 +176,37 @@
 		await supabase.auth.signOut();
 		goto('/');
 	};
-
-	$: if (currentProfile.avatar_url) downloadImage(currentProfile.avatar_url);
 </script>
 
 <section class="user-account">
 	<h2>Your Profile</h2>
 	<form on:submit|preventDefault={updateProfile} class="form-widget">
-		<Avatar
+		<!-- <Avatar
 			bind:avatarUrl={currentProfile.avatar_url}
 			{imageUrl}
 			{files}
 			{loading}
 			on:upload={uploadAvatar}
-		/>
+		/> -->
+		<div class="avatar">
+			<sl-avatar shape="rounded" image={isGithub ? currentProfile.avatar_url : imageUrl} />
+			<!-- TODO: This is NOT accessible to screen readers -->
+			{#if !isGithub}
+				<label class="upload" for="profile-pic">
+					<sl-button>Upload Avatar</sl-button>
+				</label>
+				<input
+					class="visually-hidden"
+					aria-label="Upload avatar"
+					type="file"
+					id="profile-pic"
+					accept="image/*"
+					bind:files
+					on:change={uploadAvatar}
+					disabled={loading}
+				/>
+			{/if}
+		</div>
 		<sl-input id="email" label="Email" type="text" value={user?.email} disabled />
 		<sl-input
 			id="username"
@@ -186,7 +216,7 @@
 			on:sl-input={(e) => (currentProfile.username = e.target.value)}
 		/>
 		<!-- TODO - use #await ... :then block?  -->
-		{#if currentProfile.shirt_size}
+		<!-- {#if currentProfile.shirt_size}
 			<sl-select
 				label="Shirt Size"
 				value={currentProfile.shirt_size}
@@ -200,14 +230,14 @@
 					</sl-option>
 				{/each}
 			</sl-select>
-		{/if}
-		<sl-input
+		{/if} -->
+		<!-- <sl-input
 			id="pullRequests"
 			label="Pull Requests"
 			type="number"
 			value={currentProfile.pull_requests}
 			on:sl-input={(e) => (currentProfile.pull_requests = e.target.value)}
-		/>
+		/> -->
 		<sl-input
 			id="website"
 			label="Website"
@@ -260,6 +290,11 @@
 		padding: 2rem;
 	}
 
+	sl-avatar {
+		--size: var(--account-avatar-size);
+		margin-bottom: 1rem;
+	}
+
 	.form-widget {
 		display: flex;
 		flex-direction: column;
@@ -271,5 +306,29 @@
 
 	sl-input::part(form-control-label) {
 		margin-bottom: 0.5rem;
+	}
+
+	.response {
+		list-style: none;
+	}
+
+	.avatar sl-button {
+		display: inline;
+		z-index: -1;
+	}
+
+	label.upload {
+		width: var(--account-avatar-size);
+		display: block;
+	}
+
+	label.upload:hover {
+		cursor: pointer;
+	}
+
+	label.upload:hover sl-button::part(base) {
+		background-color: var(--sl-color-primary-50);
+		border-color: var(--sl-color-primary-300);
+		color: var(--sl-color-primary-700);
 	}
 </style>
