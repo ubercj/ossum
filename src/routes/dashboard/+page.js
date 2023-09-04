@@ -57,7 +57,6 @@ export const load = async ({ parent, url, depends }) => {
            website,
            avatar_url,
            shirt_size,
-           pull_requests,
            group_profile!inner (
             id,
             group_id
