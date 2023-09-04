@@ -1,6 +1,5 @@
 <script>
-	import { onMount, createEventDispatcher } from 'svelte';
-	import Avatar from './Avatar.svelte';
+	import { onMount } from 'svelte';
 	import { title } from '$lib/stores/title';
 	import { getIssues, getUser } from '$lib/octokit';
 	import { goto } from '$app/navigation';
@@ -25,7 +24,6 @@
 	let currentProfile = {
 		username: '',
 		shirt_size: undefined,
-		pull_requests: undefined,
 		website: '',
 		avatar_url: ''
 	};
@@ -36,14 +34,14 @@
 	export const getUserProfile = async (userId) => {
 		return await supabase
 			.from('profiles')
-			.select('username, website, avatar_url, shirt_size, pull_requests')
+			.select('username, website, avatar_url, shirt_size')
 			.eq('id', userId)
 			.single();
 	};
 
 	/**
 	 * @param {string} userId
-	 * @param {Profile} updates
+	 * @param {Partial<Profile>} updates
 	 */
 	export const updateUserProfile = async (userId, updates) => {
 		return await supabase
@@ -62,44 +60,46 @@
 	let githubUserData;
 	let githubIssueData;
 
-	onMount(async () => {
-		if (data.session?.provider_token) {
-			githubUserData = await getUser(data.session.provider_token);
-			githubIssueData = await getIssues(githubUserData.login);
-		}
+	onMount(() => {
 		getProfile();
 	});
 
 	const getProfile = async () => {
-		if (githubUserData) {
+		// First, grab data from Github
+		if (isGithub && data.session?.provider_token) {
+			githubUserData = await getUser(data.session.provider_token);
+			githubIssueData = await getIssues(githubUserData.login);
+
 			currentProfile = {
 				username: githubUserData.name,
-				// shirt_size: data.shirt_size,
-				// pull_requests: data.pull_requests,
 				website: githubUserData.html_url,
 				avatar_url: githubUserData.avatar_url
 			};
-			return;
 		}
 
+		// Second, grab remaining data from Supabase
 		try {
 			loading = true;
+
+			if (!user?.id) {
+				throw new Error('user id is undefined');
+			}
+
 			const { data, error, status } = await getUserProfile(user.id);
 
 			if (error && status !== 406) throw error;
 
 			if (data) {
 				currentProfile = {
-					username: data.username,
+					username: currentProfile.username || data.username,
 					shirt_size: data.shirt_size,
-					pull_requests: data.pull_requests,
-					website: data.website,
-					avatar_url: data.avatar_url
+					website: currentProfile.website || data.website,
+					avatar_url: currentProfile.avatar_url || data.avatar_url
 				};
 			}
 		} catch (error) {
 			if (error instanceof Error) {
-				alert(error.message);
+				console.error(error.message);
 			}
 		} finally {
 			loading = false;
@@ -159,7 +159,14 @@
 		try {
 			loading = true;
 
-			let { error } = await updateUserProfile(user.id, currentProfile);
+			if (!user?.id) {
+				throw new Error('user id is undefined');
+			}
+
+			const newProfile = isGithub ? { shirt_size: currentProfile.shirt_size } : currentProfile;
+
+			let { error } = await updateUserProfile(user.id, newProfile);
+
 			if (error) {
 				throw error;
 			}
@@ -207,9 +214,9 @@
 			type="text"
 			value={currentProfile.username}
 			on:sl-input={(e) => (currentProfile.username = e.target.value)}
+			disabled={isGithub}
 		/>
-		<!-- TODO - use #await ... :then block?  -->
-		<!-- {#if currentProfile.shirt_size}
+		{#if currentProfile.shirt_size}
 			<sl-select
 				label="Shirt Size"
 				value={currentProfile.shirt_size}
@@ -223,20 +230,14 @@
 					</sl-option>
 				{/each}
 			</sl-select>
-		{/if} -->
-		<!-- <sl-input
-			id="pullRequests"
-			label="Pull Requests"
-			type="number"
-			value={currentProfile.pull_requests}
-			on:sl-input={(e) => (currentProfile.pull_requests = e.target.value)}
-		/> -->
+		{/if}
 		<sl-input
 			id="website"
 			label="Website"
 			type="text"
 			value={currentProfile.website}
 			on:sl-input={(e) => (currentProfile.website = e.target.value)}
+			disabled
 		/>
 		<sl-button type="submit" class="update" aria-live="polite" {loading}>
 			<span>Update Profile</span>
