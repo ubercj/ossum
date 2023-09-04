@@ -127,12 +127,8 @@
 </section>
 
 <style>
-	.groups {
-		width: 50%;
-		margin: 0 auto;
-	}
-
-	li {
+	ul {
+		padding: 0;
 		list-style: none;
 	}
 

@@ -59,9 +59,9 @@
 			{#each profiles as profile}
 				<li>
 					<sl-card>
-						<div slot="header"><h3>{profile.username}</h3></div>
-						<p>Pull requests completed: {profile.pull_requests}</p>
-						<p>Shirt size: {profile.shirt_size}</p>
+						<div slot="header"><h3>{profile.username || 'Anonymous user'}</h3></div>
+						<!-- <p>Pull requests completed: {profile.pull_requests}</p> -->
+						<p>Shirt size: {profile.shirt_size || 'Not selected'}</p>
 					</sl-card>
 				</li>
 			{/each}
