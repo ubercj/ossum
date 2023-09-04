@@ -1,7 +1,7 @@
 <script>
 	import './styles.css';
 
-	import { invalidate } from '$app/navigation';
+	import { invalidate, goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
 	export let data;
@@ -21,6 +21,11 @@
 
 		return () => subscription.unsubscribe();
 	});
+
+	const signOut = async () => {
+		await supabase.auth.signOut();
+		goto('/');
+	};
 </script>
 
 <div class="root">
@@ -36,6 +41,11 @@
 					</li>
 					<li>
 						<a href="/groups">Groups</a>
+					</li>
+					<li>
+						<sl-button type="button" variant="warning" aria-live="polite" on:click={signOut}>
+							<span>Sign Out</span>
+						</sl-button>
 					</li>
 				{:else}
 					<li>
@@ -63,6 +73,7 @@
 		list-style: none;
 		display: flex;
 		justify-content: center;
+		align-items: center;
 		gap: 1rem;
 	}
 </style>
