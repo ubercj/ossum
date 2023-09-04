@@ -279,9 +279,9 @@
 </div>
 
 <style>
-	.user-account {
-		flex: 1;
-		padding: 2rem;
+	.profile {
+		display: grid;
+		gap: 4rem;
 	}
 
 	sl-avatar {
@@ -294,7 +294,6 @@
 		flex-direction: column;
 		gap: 2rem;
 		width: 100%;
-		max-width: 640px;
 		margin: auto;
 	}
 
@@ -304,6 +303,14 @@
 
 	.response {
 		list-style: none;
+		padding-left: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	sl-card {
+		width: 100%;
 	}
 
 	.avatar sl-button {
