@@ -20,14 +20,19 @@ export const getIssues = async (username) => {
 	const issues = await octokit.request('GET /search/issues', {
 		q: `type:pr author:${username} is:merged created:>=2023-01-01`
 	});
-	return issues.data.items.map(({ title, pull_request, created_at, closed_at, state, labels }) => {
-		return {
-			title,
-			url: pull_request?.url,
-			created_at,
-			closed_at,
-			state,
-			labels
-		};
-	});
+
+	const mappedIssues = issues.data.items.map(
+		({ title, pull_request, created_at, closed_at, state, labels }) => {
+			return {
+				title,
+				url: pull_request?.url,
+				created_at,
+				closed_at,
+				state,
+				labels
+			};
+		}
+	);
+
+	return { ...issues.data, items: mappedIssues };
 };

@@ -185,38 +185,38 @@
 	};
 </script>
 
-<section class="user-account">
-	<h2>Your Profile</h2>
-	<form on:submit|preventDefault={updateProfile} class="form-widget">
-		<div class="avatar">
-			<sl-avatar shape="rounded" image={isGithub ? currentProfile.avatar_url : imageUrl} />
-			<!-- TODO: This is NOT accessible to screen readers -->
-			{#if !isGithub}
-				<label class="upload" for="profile-pic">
-					<sl-button>Upload Avatar</sl-button>
-				</label>
-				<input
-					class="visually-hidden"
-					aria-label="Upload avatar"
-					type="file"
-					id="profile-pic"
-					accept="image/*"
-					bind:files
-					on:change={uploadAvatar}
-					disabled={loading}
-				/>
-			{/if}
-		</div>
-		<sl-input id="email" label="Email" type="text" value={user?.email} disabled />
-		<sl-input
-			id="username"
-			label="Name"
-			type="text"
-			value={currentProfile.username}
-			on:sl-input={(e) => (currentProfile.username = e.target.value)}
-			disabled={isGithub}
-		/>
-		{#if currentProfile.shirt_size}
+<div class="profile">
+	<section class="user-account">
+		<h2>Your Profile</h2>
+		<form on:submit|preventDefault={updateProfile} class="form-widget">
+			<div class="avatar">
+				<sl-avatar shape="rounded" image={isGithub ? currentProfile.avatar_url : imageUrl} />
+				<!-- TODO: This is NOT accessible to screen readers -->
+				{#if !isGithub}
+					<label class="upload" for="profile-pic">
+						<sl-button>Upload Avatar</sl-button>
+					</label>
+					<input
+						class="visually-hidden"
+						aria-label="Upload avatar"
+						type="file"
+						id="profile-pic"
+						accept="image/*"
+						bind:files
+						on:change={uploadAvatar}
+						disabled={loading}
+					/>
+				{/if}
+			</div>
+			<sl-input id="email" label="Email" type="text" value={user?.email} disabled />
+			<sl-input
+				id="username"
+				label="Name"
+				type="text"
+				value={currentProfile.username}
+				on:sl-input={(e) => (currentProfile.username = e.target.value)}
+				disabled={isGithub}
+			/>
 			<sl-select
 				label="Shirt Size"
 				value={currentProfile.shirt_size}
@@ -230,53 +230,53 @@
 					</sl-option>
 				{/each}
 			</sl-select>
-		{/if}
-		<sl-input
-			id="website"
-			label="Website"
-			type="text"
-			value={currentProfile.website}
-			on:sl-input={(e) => (currentProfile.website = e.target.value)}
-			disabled
-		/>
-		<sl-button type="submit" class="update" aria-live="polite" {loading}>
-			<span>Update Profile</span>
-		</sl-button>
-		<sl-button type="button" variant="warning" aria-live="polite" on:click={signOut}>
-			<span>Sign Out</span>
-		</sl-button>
-	</form>
-</section>
+			<sl-input
+				id="website"
+				label="Website"
+				type="text"
+				value={currentProfile.website}
+				on:sl-input={(e) => (currentProfile.website = e.target.value)}
+				disabled
+			/>
+			<sl-button type="submit" class="update" aria-live="polite" {loading}>
+				<span>Update Profile</span>
+			</sl-button>
+			<sl-button type="button" variant="warning" aria-live="polite" on:click={signOut}>
+				<span>Sign Out</span>
+			</sl-button>
+		</form>
+	</section>
 
-<section class="metrics">
-	<h2>Metrics</h2>
-	<div>
-		<h3>Pull Requests</h3>
-		{#if githubIssueData}
-			<p>Total: {githubIssueData.length}</p>
-			<ul class="response">
-				{#each githubIssueData as issue}
-					<li>
-						<sl-card>
-							<div slot="header"><h3>{issue.title}</h3></div>
-							<p>{issue.created_at}</p>
-							<p>{issue.closed_at}</p>
-							<p>{issue.state}</p>
-							<p>{issue.url}</p>
-							{#if issue.labels}
-								<ul>
-									{#each issue.labels as label}
-										<li>{label}</li>
-									{/each}
-								</ul>
-							{/if}
-						</sl-card>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-	</div>
-</section>
+	<section class="metrics">
+		<h2>Metrics</h2>
+		<div>
+			<h3>Pull Requests</h3>
+			{#if githubIssueData}
+				<p>Total: {githubIssueData.total_count}</p>
+				<ul class="response">
+					{#each githubIssueData.items as issue}
+						<li>
+							<sl-card>
+								<div slot="header"><h3>{issue.title}</h3></div>
+								<p>{issue.created_at}</p>
+								<p>{issue.closed_at}</p>
+								<p>{issue.state}</p>
+								<p>{issue.url}</p>
+								{#if issue.labels}
+									<ul>
+										{#each issue.labels as label}
+											<li>{label}</li>
+										{/each}
+									</ul>
+								{/if}
+							</sl-card>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		</div>
+	</section>
+</div>
 
 <style>
 	.user-account {
