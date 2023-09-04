@@ -181,13 +181,6 @@
 <section class="user-account">
 	<h2>Your Profile</h2>
 	<form on:submit|preventDefault={updateProfile} class="form-widget">
-		<!-- <Avatar
-			bind:avatarUrl={currentProfile.avatar_url}
-			{imageUrl}
-			{files}
-			{loading}
-			on:upload={uploadAvatar}
-		/> -->
 		<div class="avatar">
 			<sl-avatar shape="rounded" image={isGithub ? currentProfile.avatar_url : imageUrl} />
 			<!-- TODO: This is NOT accessible to screen readers -->
