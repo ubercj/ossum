@@ -68,7 +68,7 @@
 		// First, grab data from Github
 		if (isGithub && data.session?.provider_token) {
 			githubUserData = await getUser(data.session.provider_token);
-			githubIssueData = await getIssues(githubUserData.login);
+			githubIssueData = await getIssues(data.session.provider_token, githubUserData.login);
 
 			currentProfile = {
 				username: githubUserData.name,

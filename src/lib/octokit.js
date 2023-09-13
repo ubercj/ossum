@@ -1,4 +1,3 @@
-import { PUBLIC_OCTOKIT_TOKEN } from '$env/static/public';
 import { Octokit } from '@octokit/core';
 
 /** @param {string} token */
@@ -11,14 +10,18 @@ export const getUser = async (token) => {
 	return user.data;
 };
 
-/** @param {string} username */
-export const getIssues = async (username) => {
+/**
+ * @param {string} token
+ * @param {string} username
+ */
+export const getIssues = async (token, username) => {
 	const octokit = new Octokit({
-		auth: PUBLIC_OCTOKIT_TOKEN
+		auth: token
 	});
 
 	const issues = await octokit.request('GET /search/issues', {
-		q: `type:pr author:${username} is:merged created:2022-10-01..2022-10-31`
+		q: `type:pr author:${username} is:merged created:2022-10-01..2022-10-31`,
+		per_page: 100
 	});
 
 	const mappedIssues = issues.data.items.map(
