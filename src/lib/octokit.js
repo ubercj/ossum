@@ -1,4 +1,6 @@
 import { Octokit } from '@octokit/core';
+import { App } from '@octokit/app';
+import { PUBLIC_GITHUB_APP_ID } from '$env/static/public';
 
 /** @param {string} token */
 export const getUser = async (token) => {
@@ -39,3 +41,16 @@ export const getIssues = async (token, username) => {
 
 	return { ...issues.data, items: mappedIssues };
 };
+
+/**
+ * @param {string} privateKey
+ */
+export const authenticateGHApp = async (privateKey) => {
+	const app = new App({
+		appId: PUBLIC_GITHUB_APP_ID,
+		privateKey: privateKey
+	});
+
+	return app;
+};
+
