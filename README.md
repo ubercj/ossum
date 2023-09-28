@@ -37,5 +37,7 @@ npm run dev -- --open
 
 ### Supabase access and environment variables
 
+[Link to the Supabase project](https://supabase.com/dashboard/project/hzfkrflswmppapxmbrfp)
+
 You'll need to be invited by an admin to get access to the Supabase instance for this project. This is where you can get the `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` environment variables. Set `VITE_REDIRECT_URL` to http://localhost:5173 for local development.
 
