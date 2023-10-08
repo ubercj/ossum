@@ -54,3 +54,27 @@ export const authenticateGHApp = async (privateKey) => {
 	return app;
 };
 
+/**
+ * @param {string} token
+ */
+export const getAllUserPulls = async (token) => {
+	const octokit = new Octokit({
+		auth: token
+	});
+
+	const pulls = await octokit.request('GET /user/repos');
+
+	return pulls.data;
+};
+
+export const getUserAccessRepos = async (token, id) => {
+	const octokit = new Octokit({
+		auth: token
+	});
+
+	const repos = await octokit.request('GET /user/installations/{installation_id}/repositories', {
+		installation_id: id
+	});
+
+	return repos.data;
+};
