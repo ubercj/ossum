@@ -2,6 +2,7 @@
 // for information about these interfaces
 
 import { SupabaseClient, Session } from '@supabase/supabase-js';
+import { App } from '@octokit/app';
 import { Database } from './DatabaseDefinitions';
 
 declare global {
@@ -9,6 +10,7 @@ declare global {
 		interface Locals {
 			supabase: SupabaseClient<Database>;
 			getSession(): Promise<Session | null>;
+			octokitApp: App;
 		}
 		interface PageData {
 			session: Session | null;

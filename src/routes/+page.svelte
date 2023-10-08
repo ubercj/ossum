@@ -49,13 +49,12 @@
 			const { data, error } = await supabase.auth.signInWithOAuth({
 				provider: 'github',
 				options: {
-					scopes: 'read:user',
 					redirectTo: import.meta.env.VITE_REDIRECT_URL
 				}
 			});
 
 			if (error) throw error;
-			goto('/dashboard');
+			// goto('/dashboard');
 		} catch (error) {
 			console.error(error);
 		} finally {

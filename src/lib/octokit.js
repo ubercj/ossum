@@ -1,4 +1,6 @@
 import { Octokit } from '@octokit/core';
+import { App } from '@octokit/app';
+import { PUBLIC_GITHUB_APP_ID } from '$env/static/public';
 
 /** @param {string} token */
 export const getUser = async (token) => {
@@ -38,4 +40,41 @@ export const getIssues = async (token, username) => {
 	);
 
 	return { ...issues.data, items: mappedIssues };
+};
+
+/**
+ * @param {string} privateKey
+ */
+export const authenticateGHApp = async (privateKey) => {
+	const app = new App({
+		appId: PUBLIC_GITHUB_APP_ID,
+		privateKey: privateKey
+	});
+
+	return app;
+};
+
+/**
+ * @param {string} token
+ */
+export const getAllUserPulls = async (token) => {
+	const octokit = new Octokit({
+		auth: token
+	});
+
+	const pulls = await octokit.request('GET /user/repos');
+
+	return pulls.data;
+};
+
+export const getUserAccessRepos = async (token, id) => {
+	const octokit = new Octokit({
+		auth: token
+	});
+
+	const repos = await octokit.request('GET /user/installations/{installation_id}/repositories', {
+		installation_id: id
+	});
+
+	return repos.data;
 };
