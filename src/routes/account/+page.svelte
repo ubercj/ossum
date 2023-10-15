@@ -58,7 +58,6 @@
 	let files;
 
 	let githubUserData;
-	let githubIssueData;
 
 	/**
 	 * @typedef {object} Contribution
@@ -81,10 +80,9 @@
 	});
 
 	const getProfile = async () => {
-		// First, grab data from Github
+		// First, grab data from Github profile if it exists
 		if (isGithub && data.session?.provider_token) {
 			githubUserData = await getUser(data.session.provider_token);
-			githubIssueData = await getIssues(data.session.provider_token, githubUserData.login);
 
 			currentProfile = {
 				username: githubUserData.name,
@@ -273,31 +271,6 @@
 
 	<section class="metrics">
 		<h2>Metrics</h2>
-		<div>
-			<h3>Pull Requests</h3>
-			{#if githubIssueData}
-				<p>Total: {githubIssueData.total_count}</p>
-				<ul class="response">
-					{#each githubIssueData.items as issue}
-						<li>
-							<sl-card>
-								<div slot="header"><h3>{issue.title}</h3></div>
-								<p>{issue.created_at}</p>
-								<p>{issue.closed_at}</p>
-								<p>{issue.state}</p>
-								<p>{issue.url}</p>
-								{#if issue.labels}
-									<ul>
-										{#each issue.labels as label}
-											<li>{label}</li>
-										{/each}
-									</ul>
-								{/if}
-							</sl-card>
-						</li>
-					{/each}
-				</ul>
-			{/if}
 		<div>
 			<h3>Contributions</h3>
 			{#if contributions}
