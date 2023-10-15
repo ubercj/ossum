@@ -60,6 +60,22 @@
 	let githubUserData;
 	let githubIssueData;
 
+	/**
+	 * @typedef {object} Contribution
+	 *
+	 * @property {string} title
+	 * @property {string} description
+	 * @property {string} opened_date
+	 * @property {string} [closed_date]
+	 * @property {string} [url]
+	 * @property {string[]} [tags]
+	 */
+
+	/**
+	 * @type {Contribution[]}
+	 */
+	let contributions;
+
 	onMount(() => {
 		getProfile();
 	});
@@ -86,8 +102,10 @@
 			}
 
 			const { data, error, status } = await getUserProfile(user.id);
+			const { data: contributionData, error: contributionError } = await getContributions(user.id);
 
 			if (error && status !== 406) throw error;
+			if (contributionError) throw contributionError;
 
 			if (data) {
 				currentProfile = {
@@ -96,6 +114,10 @@
 					website: currentProfile.website || data.website,
 					avatar_url: currentProfile.avatar_url || data.avatar_url
 				};
+			}
+
+			if (contributionData) {
+				contributions = contributionData;
 			}
 		} catch (error) {
 			if (error instanceof Error) {
@@ -178,6 +200,16 @@
 			loading = false;
 		}
 	};
+
+	/**
+	 * @param {string} userId
+	 */
+	const getContributions = async (userId) => {
+		return await supabase
+			.from('contributions')
+			.select('title, description, url, opened_date, closed_date, tags')
+			.eq('user_id', userId);
+	};
 </script>
 
 <div class="profile">
@@ -258,6 +290,36 @@
 									<ul>
 										{#each issue.labels as label}
 											<li>{label}</li>
+										{/each}
+									</ul>
+								{/if}
+							</sl-card>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		<div>
+			<h3>Contributions</h3>
+			{#if contributions}
+				<p>Total: {contributions.length}</p>
+				<ul class="response">
+					{#each contributions as contribution}
+						<li>
+							<sl-card>
+								<div slot="header">
+									<h3>{contribution.title}</h3>
+									<p>{contribution.description}</p>
+								</div>
+								<p>Opened: {contribution.opened_date}</p>
+								<p>Closed: {contribution.closed_date || 'Still open'}</p>
+								{#if contribution.url}
+									<p>Link: <a href={contribution.url}>{contribution.url}</a></p>
+								{/if}
+								{#if contribution.tags}
+									<h4>Tags</h4>
+									<ul>
+										{#each contribution.tags as tag}
+											<li>{tag}</li>
 										{/each}
 									</ul>
 								{/if}
