@@ -58,17 +58,31 @@
 	let files;
 
 	let githubUserData;
-	let githubIssueData;
+
+	/**
+	 * @typedef {object} Contribution
+	 *
+	 * @property {string} title
+	 * @property {string} description
+	 * @property {string} opened_date
+	 * @property {string} [closed_date]
+	 * @property {string} [url]
+	 * @property {string[]} [tags]
+	 */
+
+	/**
+	 * @type {Contribution[]}
+	 */
+	let contributions;
 
 	onMount(() => {
 		getProfile();
 	});
 
 	const getProfile = async () => {
-		// First, grab data from Github
+		// First, grab data from Github profile if it exists
 		if (isGithub && data.session?.provider_token) {
 			githubUserData = await getUser(data.session.provider_token);
-			githubIssueData = await getIssues(data.session.provider_token, githubUserData.login);
 
 			currentProfile = {
 				username: githubUserData.name,
@@ -86,8 +100,10 @@
 			}
 
 			const { data, error, status } = await getUserProfile(user.id);
+			const { data: contributionData, error: contributionError } = await getContributions(user.id);
 
 			if (error && status !== 406) throw error;
+			if (contributionError) throw contributionError;
 
 			if (data) {
 				currentProfile = {
@@ -96,6 +112,10 @@
 					website: currentProfile.website || data.website,
 					avatar_url: currentProfile.avatar_url || data.avatar_url
 				};
+			}
+
+			if (contributionData) {
+				contributions = contributionData;
 			}
 		} catch (error) {
 			if (error instanceof Error) {
@@ -178,6 +198,16 @@
 			loading = false;
 		}
 	};
+
+	/**
+	 * @param {string} userId
+	 */
+	const getContributions = async (userId) => {
+		return await supabase
+			.from('contributions')
+			.select('title, description, url, opened_date, closed_date, tags')
+			.eq('user_id', userId);
+	};
 </script>
 
 <div class="profile">
@@ -242,22 +272,27 @@
 	<section class="metrics">
 		<h2>Metrics</h2>
 		<div>
-			<h3>Pull Requests</h3>
-			{#if githubIssueData}
-				<p>Total: {githubIssueData.total_count}</p>
+			<h3>Contributions</h3>
+			{#if contributions}
+				<p>Total: {contributions.length}</p>
 				<ul class="response">
-					{#each githubIssueData.items as issue}
+					{#each contributions as contribution}
 						<li>
 							<sl-card>
-								<div slot="header"><h3>{issue.title}</h3></div>
-								<p>{issue.created_at}</p>
-								<p>{issue.closed_at}</p>
-								<p>{issue.state}</p>
-								<p>{issue.url}</p>
-								{#if issue.labels}
+								<div slot="header">
+									<h3>{contribution.title}</h3>
+									<p>{contribution.description}</p>
+								</div>
+								<p>Opened: {contribution.opened_date}</p>
+								<p>Closed: {contribution.closed_date || 'Still open'}</p>
+								{#if contribution.url}
+									<p>Link: <a href={contribution.url}>{contribution.url}</a></p>
+								{/if}
+								{#if contribution.tags}
+									<h4>Tags</h4>
 									<ul>
-										{#each issue.labels as label}
-											<li>{label}</li>
+										{#each contribution.tags as tag}
+											<li>{tag}</li>
 										{/each}
 									</ul>
 								{/if}
