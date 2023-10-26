@@ -2,6 +2,7 @@
 	import { title } from '$lib/stores/title';
 	import { goto } from '$app/navigation';
 	import github_logo from '$lib/assets/github.svg';
+	import ossum_possum from '$lib/assets/OssumPossum.png';
 
 	export let data;
 	let { supabase } = data;
@@ -70,8 +71,13 @@
 </svelte:head>
 
 <section class="login">
-	<h1>Ossum</h1>
-	<p class="subheading">Create open source together</p>
+	<div class="heading-container">
+		<div class="title">
+			<h1>Ossum</h1>
+      <img src={ossum_possum} alt="" class="possum-image" />
+		</div>
+    <p class="subheading">Create open source together</p>
+	</div>
 	<div class="form-widget" aria-live="polite">
 		<sl-button
 			type="button"
@@ -119,12 +125,24 @@
 </section>
 
 <style>
+  .title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
 	.subheading {
+    margin-block-start: 0;
 		text-align: center;
 	}
 
 	.description {
 		font-size: 1.1rem;
+	}
+
+	.possum-image {
+		max-width: 100px;
 	}
 
 	.form-widget {
