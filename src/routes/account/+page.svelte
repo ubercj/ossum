@@ -75,9 +75,36 @@
 	 */
 	let contributions;
 
+	/**
+	 * @type {Contribution}
+	 */
+	let newContribution = {
+		title: '',
+		description: '',
+		opened_date: '',
+		closed_date: '',
+		url: '',
+		tags: []
+	};
+
+	/**
+	 * @type {HTMLElement}
+	 */
+	let drawer;
+
 	onMount(() => {
 		getProfile();
+		drawer.addEventListener('sl-request-close', closeDrawer);
+
+		return () => {
+			drawer.removeEventListener('sl-request-close', closeDrawer);
+		};
 	});
+
+	// This is a dumb workaround but it's necessary because of shoelace wonkiness
+	const closeDrawer = () => {
+		drawerOpen = false;
+	};
 
 	const getProfile = async () => {
 		// First, grab data from Github profile if it exists
@@ -208,6 +235,26 @@
 			.select('title, description, url, opened_date, closed_date, tags')
 			.eq('user_id', userId);
 	};
+
+	const createContribution = async () => {
+		const { error } = await supabase.from('contributions').insert(newContribution);
+
+		if (error) {
+			console.error(error);
+		} else {
+			newContribution = {
+				title: '',
+				description: '',
+				opened_date: '',
+				closed_date: '',
+				url: '',
+				tags: []
+			};
+			drawerOpen = false;
+		}
+	};
+
+	let drawerOpen = false;
 </script>
 
 <div class="profile">
@@ -272,7 +319,10 @@
 	<section class="metrics">
 		<h2>Metrics</h2>
 		<div>
-			<h3>Contributions</h3>
+			<div class="contributions-heading">
+				<h3>Contributions</h3>
+				<sl-button on:click={() => (drawerOpen = true)}>Add New</sl-button>
+			</div>
 			{#if contributions}
 				<p>Total: {contributions.length}</p>
 				<ul class="response">
@@ -303,6 +353,47 @@
 			{/if}
 		</div>
 	</section>
+
+	<sl-drawer bind:this={drawer} label="New Contribution" id="contribution-drawer" open={drawerOpen}>
+		<form class="form-widget" on:submit|preventDefault={createContribution}>
+			<sl-input
+				id="contribution-title"
+				label="Title"
+				type="text"
+				value={newContribution.title}
+				on:sl-input={(e) => (newContribution.title = e.target.value)}
+			/>
+			<sl-input
+				id="contribution-description"
+				label="Description"
+				type="text"
+				value={newContribution.description}
+				on:sl-input={(e) => (newContribution.description = e.target.value)}
+			/>
+			<sl-input
+				id="contribution-opened"
+				label="Opened"
+				type="date"
+				value={newContribution.opened_date}
+				on:sl-input={(e) => (newContribution.opened_date = e.target.value)}
+			/>
+			<sl-input
+				id="contribution-closed"
+				label="Closed"
+				type="date"
+				value={newContribution.closed_date}
+				on:sl-input={(e) => (newContribution.closed_date = e.target.value)}
+			/>
+			<sl-input
+				id="contribution-url"
+				label="Link"
+				type="text"
+				value={newContribution.url}
+				on:sl-input={(e) => (newContribution.url = e.target.value)}
+			/>
+			<sl-button type="submit">Submit</sl-button>
+		</form>
+	</sl-drawer>
 </div>
 
 <style>
@@ -326,6 +417,16 @@
 
 	sl-input::part(form-control-label) {
 		margin-bottom: 0.5rem;
+	}
+
+	.contributions-heading {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+	}
+
+	sl-drawer {
+		--size: 50vw;
 	}
 
 	.response {
