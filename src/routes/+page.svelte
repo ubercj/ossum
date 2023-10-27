@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import { title } from '$lib/stores/title';
 	import { goto } from '$app/navigation';
 	import github_logo from '$lib/assets/github.svg';
@@ -56,13 +57,19 @@
 			});
 
 			if (error) throw error;
-			goto('/dashboard');
 		} catch (error) {
 			console.error(error);
 		} finally {
 			loading = false;
 		}
 	};
+
+	onMount(async () => {
+		const user = await supabase.auth.getSession();
+		if (user?.data?.session) {
+			goto('/dashboard');
+		}
+	});
 </script>
 
 <svelte:head>
